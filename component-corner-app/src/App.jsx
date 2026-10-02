@@ -1,14 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Header from "./components/Header";
-import Hero from "./components/Hero";
-import ProductCard from "./components/ProductCard";
-import CartItem from "./components/CartItem";
 import Footer from "./components/Footer";
+
+import HomePage from "./pages/HomePage";
+import ProductsPage from "./pages/ProductsPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage";
+import CartPage from "./pages/CartPage";
+
 import "./App.css";
 
+// AI Attribution: ChatGPT was used to assist with React Router setup,
+// page component structure, product details routing, and localStorage
+// cart persistence.
+
 function App() {
-  // Shopping cart state
-  const [cart, setCart] = useState([]);
+  // Load the cart from localStorage when the app starts
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem("componentCornerCart");
+
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error("Could not load cart from localStorage:", error);
+      return [];
+    }
+  });
 
   // Product information
   const products = [
@@ -41,74 +59,75 @@ function App() {
     },
   ];
 
+  // Save cart to localStorage whenever the cart changes
+  useEffect(() => {
+    localStorage.setItem("componentCornerCart", JSON.stringify(cart));
+  }, [cart]);
+
   // Add a product to the shopping cart
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    setCart((currentCart) => [...currentCart, product]);
   };
 
   // Remove a product from the shopping cart
   const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
+    setCart((currentCart) =>
+      currentCart.filter((item) => item.id !== id)
+    );
   };
 
-  // Calculate the total price of everything in the cart
-  const cartTotal = cart.reduce((total, item) => {
-    return total + item.price;
-  }, 0);
-
   return (
-    <div className="app">
-      <Header
-        storeName="TechCorner"
-        cartCount={cart.length}
-      />
+    <BrowserRouter>
+      <div className="app">
+        <Header
+          storeName="TechCorner"
+          cartCount={cart.length}
+        />
 
-      <Hero
-        title="Upgrade Your Setup"
-        subtitle="Discover quality computer and gaming accessories built for your everyday setup."
-        ctaText="Shop Now"
-      />
+        <Routes>
+          <Route
+            path="/"
+            element={<HomePage />}
+          />
 
-      <main className="products-section">
-        <h2>Featured Products</h2>
+          <Route
+            path="/products"
+            element={
+              <ProductsPage
+                products={products}
+                addToCart={addToCart}
+              />
+            }
+          />
 
-        <div className="product-grid">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onAddToCart={addToCart}
-            />
-          ))}
-        </div>
+          <Route
+            path="/products/:productId"
+            element={
+              <ProductDetailsPage
+                products={products}
+                addToCart={addToCart}
+              />
+            }
+          />
 
-        <section className="cart-section">
-          <h2>Shopping Cart</h2>
+          <Route
+            path="/cart"
+            element={
+              <CartPage
+                cart={cart}
+                removeFromCart={removeFromCart}
+              />
+            }
+          />
+        </Routes>
 
-          {cart.length === 0 ? (
-            <p>Your cart is empty.</p>
-          ) : (
-            <>
-              {cart.map((item) => (
-                <CartItem
-                  key={item.id}
-                  item={item}
-                  onRemove={removeFromCart}
-                />
-              ))}
-
-              <h3>Cart Total: ${cartTotal.toFixed(2)}</h3>
-            </>
-          )}
-        </section>
-      </main>
-
-      <Footer
-        storeName="TechCorner"
-        email="support@techcorner.com"
-        phone="(555) 123-4567"
-      />
-    </div>
+        <Footer
+          storeName="TechCorner"
+          email="support@techcorner.com"
+          phone="(555) 123-4567"
+        />
+      </div>
+    </BrowserRouter>
   );
 }
 

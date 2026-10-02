@@ -1,21 +1,24 @@
+import { Link } from "react-router-dom";
 import "./Header.css";
 
 function Header({ storeName, cartCount }) {
   return (
     <header className="header">
       <div className="header-container">
-        <h1 className="store-name">{storeName}</h1>
+        <Link to="/" className="store-name">
+          {storeName}
+        </Link>
 
         <nav>
-          <a href="#">Home</a>
-          <a href="#">Products</a>
-          <a href="#">About</a>
-          <a href="#">Contact</a>
+          <Link to="/">Home</Link>
+          <Link to="/products">Products</Link>
         </nav>
 
         <div className="cart-container">
-          <span className="cart-icon">🛒</span>
-          <span className="cart-count">{cartCount}</span>
+          <Link to="/cart" className="cart-link">
+            <span className="cart-icon">🛒</span>
+            <span className="cart-count">{cartCount}</span>
+          </Link>
         </div>
       </div>
     </header>

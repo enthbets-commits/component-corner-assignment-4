@@ -1,16 +1,27 @@
+import { Link } from "react-router-dom";
 import "./ProductCard.css";
 
 function ProductCard({ product, onAddToCart }) {
   return (
     <div className="product-card">
-      <img
-        src={product.image}
-        alt={product.name}
-        className="product-image"
-      />
+      <Link
+        to={`/products/${product.id}`}
+        className="product-image-link"
+      >
+        <img
+          src={product.image}
+          alt={product.name}
+          className="product-image"
+        />
+      </Link>
 
       <div className="product-info">
-        <h3>{product.name}</h3>
+        <Link
+          to={`/products/${product.id}`}
+          className="product-title-link"
+        >
+          <h3>{product.name}</h3>
+        </Link>
 
         <p className="product-description">
           {product.description}
